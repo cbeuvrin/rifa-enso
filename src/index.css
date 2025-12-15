@@ -5,3 +5,43 @@
 .noise-bg {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
 }
+
+/* INFINITE SPIN: Moves up continuously */
+@keyframes reel-spin {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+.animate-reel-spin {
+    animation: reel-spin 0.3s linear infinite;
+    /* Slightly slower to see icons better? Or keep fast? User said "giran solo dos", maybe too fast + too few icons. Keeping speed, increasing icons. */
+}
+
+/* LANDING: Slides in from top/center to final position */
+/* Previous spin moves UP (translateY negative). To land, we want the final strip to slide DOWN into place? 
+   Actually, slots usually spin DOWN (symbols fall). My previous spin was `translateY(-50%)` which moves items UP.
+   Let's stick to UP movement for consistency.
+   Spin: Moves from 0 to -50% (items go UP).
+   Landing: Should start at 0 (or slight offset) and ease out to final position.
+   Wait, if spin moves UP, the "next" symbols come from BELOW.
+   So Landing should start with result symbols BELOW view, and slide UP into view.
+*/
+@keyframes reel-land {
+    0% {
+        transform: translateY(10%);
+    }
+
+    /* Start slightly lower */
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.animate-reel-land {
+    animation: reel-land 0.4s ease-out forwards;
+}

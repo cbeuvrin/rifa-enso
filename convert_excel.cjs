@@ -13,14 +13,19 @@ try {
     // Read with header: 1 to get arrays
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+    // Log headers to identify date column
+    console.log('Headers (Row 1):', rows[1]);
+
+
     // Row index 1 is headers (0-based)
     // Data starts at index 2
     const dataRows = rows.slice(2);
 
-    const employees = dataRows.map(row => {
+    const employees = dataRows.map((row, index) => {
         const id = row[0]; // NÚMERO DE COLABORADOR
         const fullName = row[1]; // NOMBRE
         const title = row[2]; // PUESTO (Role)
+        const rawDate = row[5]; // FECHA DE INGRESO
 
         if (!id || !fullName) return null;
 
@@ -44,12 +49,27 @@ try {
             name = parts.join(" ");
         }
 
+        // Handle Date Conversion
+        let hiringDate = null;
+        if (typeof rawDate === 'number') {
+            // Excel Serial Date to JS Date
+            // 25569 is the offset from 1900-01-01 to 1970-01-01
+            const utc_days = Math.floor(rawDate - 25569);
+            const utc_value = utc_days * 86400;
+            const dateObj = new Date(utc_value * 1000);
+            hiringDate = dateObj.toISOString();
+        } else if (typeof rawDate === 'string') {
+            // Try parsing if string (rare in this specific file based on check)
+            hiringDate = new Date(rawDate).toISOString();
+        }
+
         return {
             id: String(id).trim(),
             name: name,
             surname: surname,
             fullName: cleanName,
-            role: (String(title).toLowerCase().includes('director') || String(title).toLowerCase().includes('general')) ? 'director' : 'empleado'
+            role: (String(title).toLowerCase().includes('director') || String(title).toLowerCase().includes('general')) ? 'director' : 'empleado',
+            hiringDate: hiringDate
         };
     }).filter(e => e !== null);
 
