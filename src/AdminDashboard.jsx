@@ -2,24 +2,43 @@
 import React, { useState, useEffect } from 'react';
 import { Download, RefreshCw, ArrowLeft } from 'lucide-react';
 
+import { supabase } from './supabaseClient';
+
 export default function AdminDashboard({ onBack }) {
     const [history, setHistory] = useState([]);
 
-    const loadHistory = () => {
-        const saved = localStorage.getItem('game_history');
-        if (saved) {
-            try {
-                setHistory(JSON.parse(saved).reverse()); // Newest first
-            } catch (e) {
-                console.error("Error parsing history", e);
+    const loadHistory = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('game_history')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Error loading history:", error);
+                return;
             }
+
+            // Map Supabase columns to component state format
+            const mappedHistory = data.map(item => ({
+                timestamp: item.created_at,
+                employeeId: item.employee_id,
+                employeeName: item.employee_name,
+                tenureDays: item.tenure_days,
+                win: item.win,
+                prize: item.prize
+            }));
+
+            setHistory(mappedHistory);
+        } catch (e) {
+            console.error("Connection error", e);
         }
     };
 
     useEffect(() => {
         loadHistory();
-        // Optional: Poll for changes if needed in real-time across tabs
-        const interval = setInterval(loadHistory, 2000);
+        // Poll for changes every 5 seconds
+        const interval = setInterval(loadHistory, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -56,13 +75,19 @@ export default function AdminDashboard({ onBack }) {
         return rows.map(e => e.join(",")).join("\n");
     };
 
-    const clearHistory = () => {
-        if (confirm("¿Estás seguro de BORRAR todo el historial? Esto no se puede deshacer.")) {
-            localStorage.removeItem('game_history');
-            localStorage.removeItem('played_employees'); // Also reset played status? Maybe separate.
-            localStorage.removeItem('totem_stats');
-            setHistory([]);
-            alert("Historial borrado.");
+    const clearHistory = async () => {
+        if (confirm("ADVERTENCIA: Estás a punto de borrar TODO el historial de la base de datos (Nube). ¿Estás seguro?")) {
+            const { error } = await supabase
+                .from('game_history')
+                .delete()
+                .neq('id', 0); // Hack to delete all rows equivalent to TRUNCATE
+
+            if (error) {
+                alert("Error borrando historial: " + error.message);
+            } else {
+                setHistory([]);
+                alert("Historial borrado de la nube.");
+            }
         }
     };
 

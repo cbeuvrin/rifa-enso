@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Briefcase, Coffee, Award, Star, Zap, AlertCircle } from 'lucide-react';
 import EMPLOYEES_DATA from './data/employees.json';
 import AdminDashboard from './AdminDashboard';
+import { supabase } from './supabaseClient';
 
 
 // --- VISUAL ASSETS ---
@@ -169,15 +170,11 @@ export default function App() {
   const [gameResult, setGameResult] = useState(null);
   const [showResultModal, setShowResultModal] = useState(false);
 
+  // Local stats for batching (still local, but history is global)
   const [totemStats, setTotemStats] = useState({
     totalPlays: 0,
     currentBatchWins: 0,
     lastResetBatch: 0
-  });
-
-  const [playedEmployees, setPlayedEmployees] = useState(() => {
-    const saved = localStorage.getItem('played_employees');
-    return saved ? JSON.parse(saved) : [];
   });
 
   // --- EFFECTS ---
@@ -199,10 +196,6 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('totem_stats', JSON.stringify(totemStats));
   }, [totemStats]);
-
-  useEffect(() => {
-    localStorage.setItem('played_employees', JSON.stringify(playedEmployees));
-  }, [playedEmployees]);
 
   // --- LOGIC ---
 
@@ -243,7 +236,7 @@ export default function App() {
     }
   };
 
-  const handleCheckId = () => {
+  const handleCheckId = async () => {
     const { id } = formData;
     if (!id) {
       setError("INGRESA TU NÚMERO DE EMPLEADO");
@@ -256,9 +249,29 @@ export default function App() {
       return;
     }
 
-    if (playedEmployees.includes(user.id) && user.id !== '9999') {
-      setError("YA JUGASTE");
-      return;
+    // CHECK DB FOR PREVIOUS PLAY
+    // Exception for Test IDs
+    if (user.id !== '9999' && user.id !== '32') {
+      try {
+        const { data, error: dbError } = await supabase
+          .from('game_history')
+          .select('id')
+          .eq('employee_id', String(id))
+          .limit(1);
+
+        if (dbError) {
+          console.error("Error checking history:", dbError);
+          // Optional: Allow play if DB fails? Or block?
+          // setError("ERROR DE CONEXIÓN"); return;
+        }
+
+        if (data && data.length > 0) {
+          setError("YA JUGASTE");
+          return;
+        }
+      } catch (e) {
+        console.error("Connection failed", e);
+      }
     }
 
     // Found valid user, move to next step
@@ -309,14 +322,9 @@ export default function App() {
     setGameResult(null);
   };
 
-  const spin = () => {
+  const spin = async () => {
     if (isSpinning) return;
     if (!currentUser) return;
-
-    // Mark as played
-    if (!playedEmployees.includes(currentUser.id) && currentUser.id !== '9999') {
-      setPlayedEmployees(prev => [...prev, currentUser.id]);
-    }
 
     setIsSpinning(true);
     setReelStatuses(['spinning', 'spinning', 'spinning', 'spinning', 'spinning']);
@@ -401,18 +409,22 @@ export default function App() {
     // UPDATE REELS IMMEDIATELY (Hidden by spin overlay)
     setReels(finalReels);
 
-    // --- SAVE TO HISTORY ---
-    const historyItem = {
-      timestamp: new Date().toISOString(),
-      employeeId: currentUser.id,
-      employeeName: currentUser.fullName,
-      tenureDays: isNewEmployee ? diffDays : null,
-      win: isWinner,
-      prize: prize
-    };
-    const currentHistory = JSON.parse(localStorage.getItem('game_history') || '[]');
-    currentHistory.push(historyItem);
-    localStorage.setItem('game_history', JSON.stringify(currentHistory));
+    // --- SAVE TO SUPABASE ---
+    try {
+      const { error: insertError } = await supabase.from('game_history').insert([{
+        employee_id: currentUser.id,
+        employee_name: currentUser.fullName,
+        tenure_days: isNewEmployee ? diffDays : null,
+        win: isWinner,
+        prize: prize
+      }]);
+
+      if (insertError) {
+        console.error("Error saving game:", insertError);
+      }
+    } catch (e) {
+      console.error("Supabase insert exception:", e);
+    }
 
 
     // --- ANIMATION SEQUENCE ---
