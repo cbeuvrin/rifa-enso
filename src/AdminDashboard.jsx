@@ -1,11 +1,35 @@
 
 import React, { useState, useEffect } from 'react';
-import { Download, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Download, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react';
 
 import { supabase } from './supabaseClient';
 
 export default function AdminDashboard({ onBack }) {
     const [history, setHistory] = useState([]);
+    const [emergencyMode, setEmergencyMode] = useState(false);
+
+    const loadSettings = async () => {
+        const { data } = await supabase.from('app_settings').select('emergency_mode').eq('id', 1).single();
+        if (data) setEmergencyMode(data.emergency_mode);
+    };
+
+    const toggleEmergency = async () => {
+        const newState = !emergencyMode;
+        // Optimistic update
+        setEmergencyMode(newState);
+
+        const { error } = await supabase
+            .from('app_settings')
+            .update({ 'emergency_mode': newState })
+            .eq('id', 1);
+
+        if (error) {
+            console.error("Error updating settings", error);
+            // Revert
+            setEmergencyMode(!newState);
+            alert("Error al cambiar modo: " + error.message);
+        }
+    };
 
     const loadHistory = async () => {
         try {
@@ -36,9 +60,13 @@ export default function AdminDashboard({ onBack }) {
     };
 
     useEffect(() => {
+        loadSettings();
         loadHistory();
         // Poll for changes every 5 seconds
-        const interval = setInterval(loadHistory, 5000);
+        const interval = setInterval(() => {
+            loadHistory();
+            loadSettings();
+        }, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -94,34 +122,39 @@ export default function AdminDashboard({ onBack }) {
     return (
         <div className="min-h-screen bg-zinc-950 text-yellow-100 font-sans p-8">
             <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center mb-8 border-b border-yellow-800/30 pb-4">
-                    <h1 className="text-3xl font-serif text-yellow-500 uppercase tracking-widest">
-                        Panel de Control - Rifa
-                    </h1>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={onBack}
-                            className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded border border-zinc-600 transition-colors"
-                        >
-                            <ArrowLeft size={16} /> Volver al Juego
+                <div className="flex justify-between items-center mb-8">
+                    <div className="flex items-center gap-4">
+                        <button onClick={onBack} className="flex items-center gap-2 text-yellow-500 hover:text-yellow-400 transition-colors">
+                            <ArrowLeft size={20} />
+                            <span className="font-serif tracking-widest text-sm">VOLVER</span>
                         </button>
+                        <h1 className="text-3xl font-serif text-yellow-100 uppercase tracking-widest">Dashboard</h1>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        {/* EMERGENCY BUTTON */}
                         <button
-                            onClick={loadHistory}
-                            className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded border border-zinc-600 transition-colors"
+                            onClick={toggleEmergency}
+                            className={`
+                                px-4 py-2 rounded font-bold uppercase tracking-widest text-sm border flex items-center gap-2 transition-all
+                                ${emergencyMode
+                                    ? 'bg-red-600 border-red-500 text-white animate-pulse shadow-[0_0_15px_red]'
+                                    : 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700'}
+                            `}
                         >
-                            <RefreshCw size={16} /> Actualizar
+                            <AlertCircle size={16} />
+                            {emergencyMode ? "MODO EMERGENCIA: ACTIVO" : "MODO EMERGENCIA: OFF"}
                         </button>
-                        <button
-                            onClick={downloadCSV}
-                            className="flex items-center gap-2 px-4 py-2 bg-yellow-700 hover:bg-yellow-600 text-black font-bold rounded shadow-[0_0_15px_rgba(255,200,0,0.2)] transition-colors"
-                        >
-                            <Download size={16} /> Exportar CSV
+
+                        <button onClick={loadHistory} className="p-2 text-yellow-500 hover:bg-white/10 rounded-full transition-colors" title="Actualizar">
+                            <RefreshCw size={20} />
                         </button>
-                        <button
-                            onClick={clearHistory}
-                            className="px-4 py-2 bg-red-900/50 hover:bg-red-800/50 text-red-200 border border-red-800 rounded transition-colors text-xs"
-                        >
-                            Borrar Todo
+                        <button onClick={downloadCSV} className="flex items-center gap-2 bg-yellow-700 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-serif tracking-wide transition-colors">
+                            <Download size={18} />
+                            CSV
+                        </button>
+                        <button onClick={clearHistory} className="px-4 py-2 text-red-500 hover:bg-red-900/20 rounded border border-red-900/50 text-xs tracking-widest uppercase">
+                            Borrar
                         </button>
                     </div>
                 </div>

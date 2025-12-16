@@ -332,6 +332,22 @@ export default function App() {
     // --- DETERMINE WIN/LOSS IMMEDIATELY ---
 
     let isWinner = false;
+    let emergencyMode = false;
+
+    // 0. CHECK EMERGENCY MODE (Globally enabled?)
+    try {
+      const { data: settings } = await supabase
+        .from('app_settings')
+        .select('emergency_mode')
+        .eq('id', 1)
+        .single();
+
+      if (settings) {
+        emergencyMode = settings.emergency_mode;
+      }
+    } catch (e) {
+      console.warn("Could not fetch emergency settings (table might be missing)", e);
+    }
 
     // 1. Logic Check (Director & Tenure)
     const isDirector = currentUser.role === 'director';
@@ -358,10 +374,15 @@ export default function App() {
       let winsInCurrentBatch = totemStats.currentBatchWins;
       if (currentBatchIndex > totemStats.lastResetBatch) winsInCurrentBatch = 0;
 
+      // PRIZE AVAILABILITY CHECK
       if (winsInCurrentBatch >= PRIZES_PER_BATCH) {
+        // No prizes left in this batch -> LOSE
         isWinner = false;
+      } else if (emergencyMode) {
+        // EMERGENCY MODE ON + PRIZES AVAILABLE -> FORCE WIN
+        isWinner = true;
       } else {
-        // 3. Probability Check
+        // 3. Normal Probability Check
         isWinner = Math.random() < WIN_PROBABILITY;
       }
     }
