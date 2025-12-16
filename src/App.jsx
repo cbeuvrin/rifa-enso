@@ -388,7 +388,7 @@ export default function App() {
     }
 
     // FORCE WIN FOR TESTING
-    if (currentUser.id === '9999' || currentUser.id === '32') isWinner = true;
+    if (currentUser.id === '9999') isWinner = true;
 
     // Generate result reels
     let finalReels = Array(REEL_COUNT).fill(null).map(() =>

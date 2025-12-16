@@ -288,14 +288,6 @@
     "hiringDate": "2025-10-20T00:00:00.000Z"
   },
   {
-    "id": "1900",
-    "name": "EDUARDO",
-    "surname": "MINCHACA SANJUAN",
-    "fullName": "EDUARDO MINCHACA SANJUAN",
-    "role": "director",
-    "hiringDate": "2017-09-04T00:00:00.000Z"
-  },
-  {
     "id": "501492",
     "name": "ANTONIO ENRIQUE",
     "surname": "GONZALEZ PERALTA",
@@ -526,14 +518,6 @@
     "fullName": "GABRIELA MARIBEL FRANCO CAMARENA",
     "role": "empleado",
     "hiringDate": "2025-10-20T00:00:00.000Z"
-  },
-  {
-    "id": "502316",
-    "name": "SAMANTHA MIRELLE",
-    "surname": "TIBURCIO BRICEÑO",
-    "fullName": "SAMANTHA MIRELLE TIBURCIO BRICEÑO",
-    "role": "empleado",
-    "hiringDate": "2025-08-04T00:00:00.000Z"
   },
   {
     "id": "500744",
@@ -990,14 +974,6 @@
     "fullName": "BRENDA MARLEN VILLEGAS RUIZ",
     "role": "empleado",
     "hiringDate": "2015-02-16T00:00:00.000Z"
-  },
-  {
-    "id": "501676",
-    "name": "CYNTHIA",
-    "surname": "MELENDEZ CORTES",
-    "fullName": "CYNTHIA MELENDEZ CORTES",
-    "role": "empleado",
-    "hiringDate": "2023-09-04T00:00:00.000Z"
   },
   {
     "id": "501995",
@@ -7856,14 +7832,6 @@
     "hiringDate": "2017-07-17T00:00:00.000Z"
   },
   {
-    "id": "502473",
-    "name": "GUILLERMO CARLOS ANTONIO",
-    "surname": "ZENEA ARELLANO",
-    "fullName": "GUILLERMO CARLOS ANTONIO ZENEA ARELLANO",
-    "role": "empleado",
-    "hiringDate": "2025-09-08T00:00:00.000Z"
-  },
-  {
     "id": "502275",
     "name": "MARIA JOSE",
     "surname": "OCAÑA CRUZ",
@@ -9478,5 +9446,109 @@
     "fullName": "LUIS ALBERTO RAFAEL GONZALEZ ISLAS",
     "role": "empleado",
     "hiringDate": "2025-11-03T00:00:00.000Z"
+  },
+  {
+    "id": "502598",
+    "name": "IÑIGO",
+    "surname": "GUERRA URIBE",
+    "fullName": "IÑIGO GUERRA URIBE",
+    "role": "empleado",
+    "hiringDate": "2025-12-08T00:00:00.000Z"
+  },
+  {
+    "id": "502612",
+    "name": "ANA KAREN",
+    "surname": "PEREZ ALVAREZ",
+    "fullName": "ANA KAREN PEREZ ALVAREZ",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502602",
+    "name": "JOEL REYNALDO",
+    "surname": "TIRSO MONTES",
+    "fullName": "JOEL REYNALDO TIRSO MONTES",
+    "role": "empleado",
+    "hiringDate": "2025-12-08T00:00:00.000Z"
+  },
+  {
+    "id": "502607",
+    "name": "ASCENCION",
+    "surname": "MARTINEZ ALONSO",
+    "fullName": "ASCENCION MARTINEZ ALONSO",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502603",
+    "name": "RAUL",
+    "surname": "OLVERA RAMIREZ",
+    "fullName": "RAUL OLVERA RAMIREZ",
+    "role": "empleado",
+    "hiringDate": "2025-12-08T00:00:00.000Z"
+  },
+  {
+    "id": "502618",
+    "name": "ALAN OSWALDO",
+    "surname": "RAMIREZ HERNANDEZ",
+    "fullName": "ALAN OSWALDO RAMIREZ HERNANDEZ",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502606",
+    "name": "JIMENA PAULINA",
+    "surname": "ROSAS RIVERA",
+    "fullName": "JIMENA PAULINA ROSAS RIVERA",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502616",
+    "name": "MARIA",
+    "surname": "ALMAGRO RUSCHKE",
+    "fullName": "MARIA ALMAGRO RUSCHKE",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502613",
+    "name": "BALAAM",
+    "surname": "SEGURA HERRERA",
+    "fullName": "BALAAM SEGURA HERRERA",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502617",
+    "name": "DANIEL",
+    "surname": "OLMOS PEÑA",
+    "fullName": "DANIEL OLMOS PEÑA",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502608",
+    "name": "JENIFFER GEORGINA",
+    "surname": "SANCHEZ DORADO",
+    "fullName": "JENIFFER GEORGINA SANCHEZ DORADO",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502605",
+    "name": "CESAR",
+    "surname": "LOPEZ GUZMAN",
+    "fullName": "CESAR LOPEZ GUZMAN",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
+  },
+  {
+    "id": "502615",
+    "name": "ROSA EMILIA",
+    "surname": "MACHORRO LARA",
+    "fullName": "ROSA EMILIA MACHORRO LARA",
+    "role": "empleado",
+    "hiringDate": "2025-12-15T00:00:00.000Z"
   }
 ]
