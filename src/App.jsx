@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Briefcase, Coffee, Award, Star, Zap, AlertCircle } from 'lucide-react';
+import { User, Briefcase, Coffee, Award, Star, Zap, AlertCircle, ChevronLeft } from 'lucide-react';
 import EMPLOYEES_DATA from './data/employees.json';
 import PRIZES_DATA from './data/prizes.json';
 import AdminDashboard from './AdminDashboard';
