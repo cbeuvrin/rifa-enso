@@ -626,7 +626,7 @@ export default function App() {
                                 type="text"
                                 value={formData.name}
                                 readOnly
-                                placeholder="NOMBRE(S)"
+                                placeholder="NOMBRE"
                                 className={`relative w-full bg-black border-2 rounded-lg py-4 px-4 text-yellow-100 font-serif text-xl text-center tracking-widest focus:outline-none placeholder:text-zinc-800 uppercase shadow-[inset_0_2px_10px_rgba(0,0,0,1)] ${activeField === 'name' ? 'border-yellow-400 bg-yellow-900/10' : 'border-yellow-800/30'}`}
                               />
                               <div className="text-center text-[10px] text-yellow-600 mt-1 tracking-widest uppercase">NOMBRE</div>
