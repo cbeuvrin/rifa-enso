@@ -624,18 +624,7 @@ export default function App() {
                                 readOnly
                                 className="relative w-full bg-black border-2 border-yellow-800/30 rounded-lg py-4 px-4 text-yellow-100 font-serif text-xl text-center tracking-widest focus:outline-none uppercase shadow-[inset_0_2px_10px_rgba(0,0,0,1)]"
                               />
-                              <div className="flex justify-between items-center mt-1 px-1">
-                                <div className="text-[10px] text-yellow-600 tracking-widest uppercase">ID EMPLEADO</div>
-                                <button
-                                  onClick={() => {
-                                    setCurrentScreen('login-id');
-                                    setFormData(prev => ({ ...prev, id: '' }));
-                                  }}
-                                  className="text-[10px] text-yellow-600/70 hover:text-yellow-400 uppercase tracking-widest underline decoration-yellow-800/50 hover:decoration-yellow-400 transition-all"
-                                >
-                                  (Corregir)
-                                </button>
-                              </div>
+                              <div className="text-center text-[10px] text-yellow-600 mt-1 tracking-widest uppercase">ID EMPLEADO</div>
                             </div>
 
                             {/* Name Input */}
@@ -682,6 +671,18 @@ export default function App() {
                           </div>
                         </div>
                       )}
+
+                      {/* FLOATING BACK BUTTON */}
+                      <button
+                        onClick={() => {
+                          setCurrentScreen('login-id');
+                          setFormData(prev => ({ ...prev, id: '' }));
+                        }}
+                        className="absolute bottom-0 right-0 p-4 text-yellow-600 hover:text-yellow-300 transition-all hover:scale-110"
+                        title="Corregir ID"
+                      >
+                        <ChevronLeft size={32} />
+                      </button>
                     </div>
                   )}
 
