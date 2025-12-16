@@ -490,7 +490,7 @@ export default function App() {
 
           {/* THE CABINET - FULL SCREEN VERTICAL */}
           {/* Responsive Fix: On desktop/landscape (md), auto height + limited width to simulate totem + allow scroll */}
-          <div className="relative z-10 flex flex-col items-center w-full h-full md:h-auto md:w-[500px] md:aspect-auto transition-all duration-300">
+          <div className="relative z-10 flex flex-col items-center w-full h-full md:h-auto md:w-full md:landscape:w-[500px] md:portrait:w-full md:portrait:max-w-none md:aspect-auto transition-all duration-300">
 
             {/* TOPPER */}
             <div className="w-[80%] md:w-[60%] h-12 bg-gradient-to-tb from-yellow-700 via-yellow-400 to-yellow-800 rounded-t-full flex items-center justify-center border-b-4 border-black shadow-[0_-5px_20px_rgba(255,215,0,0.3)] relative overflow-hidden -mb-1 z-0">
