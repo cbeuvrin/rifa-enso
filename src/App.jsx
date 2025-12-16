@@ -613,6 +613,31 @@ export default function App() {
                           <h2 className="text-yellow-500 font-serif text-sm tracking-[0.4em] uppercase drop-shadow-md text-center">Confirmaci&oacute;n de Identidad</h2>
 
                           <div className="flex gap-4 w-full max-w-2xl">
+                            {/* ID Display */}
+                            <div
+                              className={`relative group flex-1 opacity-70 cursor-not-allowed`}
+                            >
+                              <div className="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-yellow-300 rounded-lg blur opacity-0"></div>
+                              <input
+                                type="text"
+                                value={formData.id}
+                                readOnly
+                                className="relative w-full bg-black border-2 border-yellow-800/30 rounded-lg py-4 px-4 text-yellow-100 font-serif text-xl text-center tracking-widest focus:outline-none uppercase shadow-[inset_0_2px_10px_rgba(0,0,0,1)]"
+                              />
+                              <div className="flex justify-between items-center mt-1 px-1">
+                                <div className="text-[10px] text-yellow-600 tracking-widest uppercase">ID EMPLEADO</div>
+                                <button
+                                  onClick={() => {
+                                    setCurrentScreen('login-id');
+                                    setFormData(prev => ({ ...prev, id: '' }));
+                                  }}
+                                  className="text-[10px] text-yellow-600/70 hover:text-yellow-400 uppercase tracking-widest underline decoration-yellow-800/50 hover:decoration-yellow-400 transition-all"
+                                >
+                                  (Corregir)
+                                </button>
+                              </div>
+                            </div>
+
                             {/* Name Input */}
                             <div
                               className={`relative group flex-1 cursor-pointer transition-all ${activeField === 'name' ? 'scale-105' : 'opacity-70'}`}
