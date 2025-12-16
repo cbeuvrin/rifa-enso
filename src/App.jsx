@@ -27,9 +27,9 @@ const PRIZES_LIST = [
   "Audífonos Bluetooth", "Cena para dos", "Termo Premium", "Smartwatch Básico"
 ];
 
-const BATCH_SIZE = 250;
-const PRIZES_PER_BATCH = 20;
-const WIN_PROBABILITY = 0.15;
+const BATCH_SIZE = 27;
+const PRIZES_PER_BATCH = 3;
+const WIN_PROBABILITY = 0.18; // Slightly higher than 3/27 (0.11) to ensure prizes drop randomly but cap at 3
 // 4 Rows x 6 Columns = 24 Slots
 const REEL_COUNT = 5;
 const ROW_COUNT = 3;
