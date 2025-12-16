@@ -104,7 +104,7 @@ export default function AdminDashboard({ onBack }) {
     };
 
     const clearHistory = async () => {
-        if (confirm("ADVERTENCIA: Estás a punto de borrar TODO el historial de la base de datos (Nube). ¿Estás seguro?")) {
+        if (confirm("⚠️ ¡PELIGRO! ESTÁS A PUNTO DE REINICIAR TODO EL EVENTO.\n\n- Se borrará TODO el historial de ganadores.\n- El inventario de premios volverá al 100%.\n- Todos los empleados podrán volver a jugar.\n\n¿ESTÁS SEGURO?")) {
             const { error } = await supabase
                 .from('game_history')
                 .delete()
@@ -114,7 +114,7 @@ export default function AdminDashboard({ onBack }) {
                 alert("Error borrando historial: " + error.message);
             } else {
                 setHistory([]);
-                alert("Historial borrado de la nube.");
+                alert("Evento reiniciado correctamente. ¡Listo para comenzar!");
             }
         }
     };
@@ -154,7 +154,7 @@ export default function AdminDashboard({ onBack }) {
                             CSV
                         </button>
                         <button onClick={clearHistory} className="px-4 py-2 text-red-500 hover:bg-red-900/20 rounded border border-red-900/50 text-xs tracking-widest uppercase">
-                            Borrar
+                            REINICIAR SORTEO
                         </button>
                     </div>
                 </div>
