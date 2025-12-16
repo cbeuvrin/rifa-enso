@@ -3,10 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { Download, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react';
 
 import { supabase } from './supabaseClient';
+import PRIZES_DATA from './data/prizes.json';
 
 export default function AdminDashboard({ onBack }) {
     const [history, setHistory] = useState([]);
     const [emergencyMode, setEmergencyMode] = useState(false);
+
+    // Helper: Calculate Remaining Stock
+    const getRemainingStock = (prizeName) => {
+        if (!prizeName) return 0;
+        const totalParams = PRIZES_DATA.find(p => p.name === prizeName);
+        if (!totalParams) return '-';
+
+        const usedCount = history.filter(h => h.win && h.prize === prizeName).length;
+        return totalParams.total - usedCount;
+    };
 
     const loadSettings = async () => {
         const { data } = await supabase.from('app_settings').select('emergency_mode').eq('id', 1).single();
@@ -15,8 +26,7 @@ export default function AdminDashboard({ onBack }) {
 
     const toggleEmergency = async () => {
         const newState = !emergencyMode;
-        // Optimistic update
-        setEmergencyMode(newState);
+        setEmergencyMode(newState); // Optimistic
 
         const { error } = await supabase
             .from('app_settings')
@@ -25,8 +35,7 @@ export default function AdminDashboard({ onBack }) {
 
         if (error) {
             console.error("Error updating settings", error);
-            // Revert
-            setEmergencyMode(!newState);
+            setEmergencyMode(!newState); // Revert
             alert("Error al cambiar modo: " + error.message);
         }
     };
@@ -43,7 +52,6 @@ export default function AdminDashboard({ onBack }) {
                 return;
             }
 
-            // Map Supabase columns to component state format
             const mappedHistory = data.map(item => ({
                 timestamp: item.created_at,
                 employeeId: item.employee_id,
@@ -62,7 +70,6 @@ export default function AdminDashboard({ onBack }) {
     useEffect(() => {
         loadSettings();
         loadHistory();
-        // Poll for changes every 5 seconds
         const interval = setInterval(() => {
             loadHistory();
             loadSettings();
@@ -73,23 +80,20 @@ export default function AdminDashboard({ onBack }) {
     const downloadCSV = () => {
         if (history.length === 0) return;
 
-        // Headers
         const headers = ['Fecha/Hora', 'ID Empleado', 'Nombre', 'Resultado', 'Premio'];
-
-        // Rows
         const rows = history.map(item => [
             new Date(item.timestamp).toLocaleString(),
             item.employeeId,
-            `"${item.employeeName}"`, // Quote name to handle commas
+            `"${item.employeeName}"`,
             item.win ? 'GANADOR' : 'NO GANADOR',
             `"${item.prize || ''}"`
         ]);
 
-        // Combine
-        const csvContent = "data:text/csv;charset=utf-8,"
-            + filtersCSV([headers, ...rows]);
+        const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+        // prepend headers
+        const fullCsv = "data:text/csv;charset=utf-8," + [headers, ...rows].map(e => e.join(",")).join("\n");
 
-        const encodedUri = encodeURI(csvContent);
+        const encodedUri = encodeURI(fullCsv);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
         link.setAttribute("download", `reporte_rifa_${new Date().toISOString().slice(0, 10)}.csv`);
@@ -98,17 +102,12 @@ export default function AdminDashboard({ onBack }) {
         document.body.removeChild(link);
     };
 
-    // Helper to join array to CSV string
-    const filtersCSV = (rows) => {
-        return rows.map(e => e.join(",")).join("\n");
-    };
-
     const clearHistory = async () => {
         if (confirm("⚠️ ¡PELIGRO! ESTÁS A PUNTO DE REINICIAR TODO EL EVENTO.\n\n- Se borrará TODO el historial de ganadores.\n- El inventario de premios volverá al 100%.\n- Todos los empleados podrán volver a jugar.\n\n¿ESTÁS SEGURO?")) {
             const { error } = await supabase
                 .from('game_history')
                 .delete()
-                .neq('id', 0); // Hack to delete all rows equivalent to TRUNCATE
+                .neq('id', 0);
 
             if (error) {
                 alert("Error borrando historial: " + error.message);
@@ -132,7 +131,6 @@ export default function AdminDashboard({ onBack }) {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* EMERGENCY BUTTON */}
                         <button
                             onClick={toggleEmergency}
                             className={`
@@ -191,12 +189,13 @@ export default function AdminDashboard({ onBack }) {
                                     <th className="p-4">Antigüedad</th>
                                     <th className="p-4">Resultado</th>
                                     <th className="p-4">Premio</th>
+                                    <th className="p-4">Inventario Actual</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5 text-sm">
                                 {history.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="p-8 text-center text-zinc-500 italic">
+                                        <td colSpan="7" className="p-8 text-center text-zinc-500 italic">
                                             No hay registros todavía.
                                         </td>
                                     </tr>
@@ -222,6 +221,13 @@ export default function AdminDashboard({ onBack }) {
                                             </td>
                                             <td className="p-4 text-purple-300 font-medium">
                                                 {row.prize || '-'}
+                                            </td>
+                                            <td className="p-4 text-zinc-500 font-mono text-xs">
+                                                {row.win && row.prize ? (
+                                                    <span className="text-yellow-500/80 font-bold">
+                                                        Quedan {Math.max(0, getRemainingStock(row.prize))}
+                                                    </span>
+                                                ) : '-'}
                                             </td>
                                         </tr>
                                     ))
