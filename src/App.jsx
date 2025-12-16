@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Briefcase, Coffee, Award, Star, Zap, AlertCircle } from 'lucide-react';
 import EMPLOYEES_DATA from './data/employees.json';
+import PRIZES_DATA from './data/prizes.json';
 import AdminDashboard from './AdminDashboard';
 import { supabase } from './supabaseClient';
 
@@ -20,11 +21,6 @@ const ICONS = [
   { id: 'award', component: Award, color: 'text-purple-400', label: 'Prize' },
   { id: 'star', component: Star, color: 'text-yellow-100', label: 'Star' },
   { id: 'zap', component: Zap, color: 'text-orange-400', label: 'Zap' },
-];
-
-const PRIZES_LIST = [
-  "Bono $500 MXN", "Día Libre", "Tarjeta Amazon $200", "Kit Corporativo",
-  "Audífonos Bluetooth", "Cena para dos", "Termo Premium", "Smartwatch Básico"
 ];
 
 const BATCH_SIZE = 27;
@@ -365,6 +361,33 @@ export default function App() {
       }
     }
 
+    // --- INVENTORY CHECK ---
+    let availablePrizes = [];
+    try {
+      // Fetch all winning prizes given so far
+      const { data: prizeHistory, error: prizeError } = await supabase
+        .from('game_history')
+        .select('prize')
+        .eq('win', true);
+
+      if (!prizeError && prizeHistory) {
+        // Count distributed prizes
+        const distributedCounts = {};
+        prizeHistory.forEach(row => {
+          if (row.prize) distributedCounts[row.prize] = (distributedCounts[row.prize] || 0) + 1;
+        });
+
+        // Filter prizes that still have inventory
+        // Filter out "Total" row if present in JSON
+        availablePrizes = PRIZES_DATA.filter(p => p.name !== 'Total').filter(p => {
+          const used = distributedCounts[p.name] || 0;
+          return used < p.total;
+        });
+      }
+    } catch (e) {
+      console.error("Inventory check failed", e);
+    }
+
     // WIN CONDITION:
     if (isDirector || isNewEmployee) {
       isWinner = false;
@@ -378,8 +401,12 @@ export default function App() {
       if (winsInCurrentBatch >= PRIZES_PER_BATCH) {
         // No prizes left in this batch -> LOSE
         isWinner = false;
+      } else if (availablePrizes.length === 0) {
+        // GLOBAL INVENTORY EMPTY -> LOSE (Safety)
+        console.warn("Inventory Exhausted!");
+        isWinner = false;
       } else if (emergencyMode) {
-        // EMERGENCY MODE ON + PRIZES AVAILABLE -> FORCE WIN
+        // EMERGENCY MODE ON + PRIZES AVAILABLE in Batch & Global -> FORCE WIN
         isWinner = true;
       } else {
         // 3. Normal Probability Check
@@ -389,6 +416,11 @@ export default function App() {
 
     // FORCE WIN FOR TESTING
     if (currentUser.id === '9999') isWinner = true;
+
+    // Safety check again: If supposed to win but no prizes available globally
+    if (isWinner && availablePrizes.length === 0) {
+      isWinner = false;
+    }
 
     // Generate result reels
     let finalReels = Array(REEL_COUNT).fill(null).map(() =>
@@ -405,7 +437,9 @@ export default function App() {
         return newReel;
       });
 
-      prize = PRIZES_LIST[Math.floor(Math.random() * PRIZES_LIST.length)];
+      // SELECT PRIZE FROM AVAILABLE POOL
+      const randomIdx = Math.floor(Math.random() * availablePrizes.length);
+      prize = availablePrizes[randomIdx].name;
 
       setTotemStats(prev => ({
         ...prev,
